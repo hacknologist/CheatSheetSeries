@@ -7,9 +7,9 @@
 
 To propose changes to the existing cheat sheets or the creation of a new one, the process is as follows:
 
-1. Create an new [issue](https://github.com/OWASP/CheatSheetSeries/issues/new/choose) using either:
+1. Create a new [issue](https://github.com/OWASP/CheatSheetSeries/issues/new/choose) using either:
    - The `new_cheatsheet_proposal` template if you want to propose a new cheat sheet.
-   - The `update_cheatsheet_proposal` template if you want to modify a existing cheat sheet.
+   - The `update_cheatsheet_proposal` template if you want to modify an existing cheat sheet.
 2. Once the issue has been discussed and approved:
     1. Fork and clone this repository.
     2. Either:
@@ -23,7 +23,7 @@ To propose changes to the existing cheat sheets or the creation of a new one, th
 
 ### Markdown
 
-- Use the markdown syntax described in this [guide](https://guides.github.com/features/mastering-markdown/).
+- Use the markdown syntax described in this [guide](https://daringfireball.net/projects/markdown/syntax), it's using python-markdown so check if what you need is [supported](https://python-markdown.github.io/#support).
 - Use `**bold**` syntax for **bold** text.
 - Lists and nested lists should use `-` strictly.
 - Avoid the use of HTML in the cheat sheets (stick to pure Markdown).
@@ -68,7 +68,7 @@ When submitting changes in a PR, consider the following areas:
 ### Language
 
 - Use US English.
-    - Spell check before submitted a PR.
+    - Spell check before submitting a PR.
 - Try and keep the language relatively simple to make it easier for non-native speakers
 - Define any non-ubiquitous acronyms when they are first used.
     - This is not necessary for extremely common acronyms such as "HTTP" or "URL".

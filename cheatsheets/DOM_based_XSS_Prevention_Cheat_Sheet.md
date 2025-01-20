@@ -7,7 +7,7 @@ When looking at XSS (Cross-Site Scripting), there are three generally recognized
 - [Reflected or Stored](https://owasp.org/www-community/attacks/xss/#stored-and-reflected-xss-attacks)
 - [DOM Based XSS](https://owasp.org/www-community/attacks/DOM_Based_XSS).
 
-The [XSS Prevention Cheatsheet](Cross_Site_Scripting_Prevention_Cheat_Sheet.md) does an excellent job of addressing Reflected and Stored XSS. This cheatsheet addresses DOM (Document Object Model) based XSS and is an extension (and assumes comprehension of) the [XSS Prevention Cheatsheet](Cross_Site_Scripting_Prevention_Cheat_Sheet.md).
+The [XSS Prevention Cheatsheet](Cross_Site_Scripting_Prevention_Cheat_Sheet.md) does an excellent job of addressing Reflected and Stored XSS. This cheatsheet addresses DOM (Document Object Model) based XSS and is an extension (and assumes comprehension) of the [XSS Prevention Cheatsheet](Cross_Site_Scripting_Prevention_Cheat_Sheet.md).
 
 In order to understand DOM based XSS, one needs to see the fundamental difference between Reflected and Stored XSS when compared to DOM based XSS. The primary difference is where the attack is injected into the application.
 
@@ -220,7 +220,7 @@ HTML encoded example to highlight a fundamental difference with JavaScript encod
 <&#x61; href=...>
 ```
 
-If HTML encoding followed the same semantics as JavaScript encoding. The line above could have possibly worked to render a link. This difference makes JavaScript encoding a less viable weapon in our fight against XSS.
+If HTML encoding followed the same semantics as JavaScript encoding, the line above could have possibly worked to render a link. This difference makes JavaScript encoding a less viable weapon in our fight against XSS.
 
 ## RULE \#4 - JavaScript Escape Before Inserting Untrusted Data into the CSS Attribute Subcontext within the Execution Context
 
@@ -516,11 +516,11 @@ There are a number of open source encoding libraries out there:
 4. [Jtidy](http://jtidy.sourceforge.net/)
 5. Your company's custom implementation.
 
-Some work on a block list while others ignore important characters like "&lt;" and "&gt;".
+Some work on a denylist while others ignore important characters like "&lt;" and "&gt;".
 
 Java Encoder is an active project providing supports for HTML, CSS and JavaScript encoding.
 
-ESAPI is one of the few which works on an allow list and encodes all non-alphanumeric characters. It is important to use an encoding library that understands which characters can be used to exploit vulnerabilities in their respective contexts. Misconceptions abound related to the proper encoding that is required.
+ESAPI is one of the few which works on an allowlist and encodes all non-alphanumeric characters. It is important to use an encoding library that understands which characters can be used to exploit vulnerabilities in their respective contexts. Misconceptions abound related to the proper encoding that is required.
 
 ### Encoding Misconceptions
 

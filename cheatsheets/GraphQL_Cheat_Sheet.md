@@ -32,11 +32,11 @@ See the OWASP Cheat Sheets on [Input Validation](Input_Validation_Cheat_Sheet.md
 
 #### General Practices
 
-Validate all incoming data to only allow valid values (i.e. allow list).
+Validate all incoming data to only allow valid values (i.e. allowlist).
 
 - Use specific GraphQL [data types](https://graphql.org/learn/schema/#type-language) such as [scalars](https://graphql.org/learn/schema/#scalar-types) or [enums](https://graphql.org/learn/schema/#enumeration-types). Write custom GraphQL [validators](https://graphql.org/learn/validation/) for more complex validations. [Custom scalars](https://itnext.io/custom-scalars-in-graphql-9c26f43133f3) may also come in handy.
 - Define [schemas for mutations input](https://graphql.org/learn/schema/#input-types).
-- [List allowed characters](Input_Validation_Cheat_Sheet.md#allow-list-vs-block-list) - don't use a block list
+- [List allowed characters](Input_Validation_Cheat_Sheet.md#allow-list-vs-block-list) - don't use a denylist
     - The stricter the list of allowed characters the better. A lot of times a good starting point is only allowing alphanumeric, non-unicode characters because it will disallow many attacks.
 - To properly handle unicode input, use a [single internal character encoding](Input_Validation_Cheat_Sheet.md#validating-free-form-unicode-text)
 - Gracefully [reject invalid input](Error_Handling_Cheat_Sheet.md), being careful not to reveal excessive information about how the API and its validation works.
@@ -314,13 +314,12 @@ GraphQL APIs in production shouldn't return stack traces or be in debug mode. Do
 
 ### Tools
 
-- [InQL Scanner](https://github.com/doyensec/inql) - Security scanner for GraphQL. Particularly useful for generating queries and mutations automatically from given schema and them feeding them to scanner.
+- [InQL Scanner](https://github.com/doyensec/inql) - Security scanner for GraphQL. Particularly useful for generating queries and mutations automatically from given schema and then feeding them to scanner.
 - [GraphiQL](https://github.com/graphql/graphiql) - Schema/object exploration
 - [GraphQL Voyager](https://github.com/APIs-guru/graphql-voyager) - Schema/object exploration
 
 ### GraphQL Security Best Practices + Documentation
 
-- [GraphQL security best practices](https://leapgraph.com/graphql-api-security)
 - [Protecting GraphQL APIs from security threats - blog post](https://medium.com/swlh/protecting-your-graphql-api-from-security-vulnerabilities-e8afdfa6fbe4)
 - [https://nordicapis.com/security-points-to-consider-before-implementing-graphql/](https://nordicapis.com/security-points-to-consider-before-implementing-graphql/)
 - [Limiting resource usage to prevent DoS (timeouts, throttling, complexity management, depth limiting, etc.)](https://developer.github.com/v4/guides/resource-limitations/)

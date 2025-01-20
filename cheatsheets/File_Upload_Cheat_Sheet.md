@@ -16,6 +16,7 @@ In short, the following principles should be followed to reach a secure file upl
 - **Store the files on a different server. If that's not possible, store them outside of the webroot**
     - **In the case of public access to the files, use a handler that gets mapped to filenames inside the application (someid -> file.ext)**
 - **Run the file through an antivirus or a sandbox if available to validate that it doesn't contain malicious data**
+- **Run the file through CDR (Content Disarm & Reconstruct) if applicable type (PDF, DOCX, etc...)**
 - **Ensure that any libraries used are securely configured and kept up to date**
 - **Protect the file upload from [CSRF](Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md) attacks**
 
@@ -77,7 +78,7 @@ _The Content-Type for uploaded files is provided by the user, and as such cannot
 
 Other than defining the extension of the uploaded file, its MIME-type can be checked for a quick protection against simple file upload attacks.
 
-This can be done preferably in an allow list approach; otherwise, this can be done in a block list approach.
+This can be done preferably in an allowlist approach; otherwise, this can be done in a denylist approach.
 
 ### File Signature Validation
 
@@ -85,7 +86,7 @@ In conjunction with [content-type validation](#content-type-validation), validat
 
 > This should not be used on its own, as bypassing it is pretty common and easy.
 
-### Filename Sanitization
+### Filename Safety
 
 Filenames can endanger the system in multiple ways, either by using non acceptable characters, or by using special and restricted filenames. For Windows, refer to the following [MSDN guide](https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file?redirectedfrom=MSDN#naming-conventions). For a wider overview on different filesystems and how they treat files, refer to [Wikipedia's Filename page](https://en.wikipedia.org/wiki/Filename).
 
@@ -93,6 +94,9 @@ In order to avoid the above mentioned threat, creating a **random string** as a 
 
 - Implement a maximum length
 - Restrict characters to an allowed subset specifically, such as alphanumeric characters, hyphen, spaces, and periods
+    - Consider telling the user what an acceptable filename is.
+    - Restrict use of leading periods (hidden files) and sequential periods (directory traversal).
+    - Restrict the use of a leading hyphen or spaces to make it safer to use shell scripts to process files.
     - If this is not possible, block-list dangerous characters that could endanger the framework and system that is storing and using the files.
 
 ### File Content Validation

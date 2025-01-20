@@ -24,7 +24,7 @@ Another key feature of REST applications is the use of [HATEOAS or Hypermedia As
 
 Secure REST services must only provide HTTPS endpoints. This protects authentication credentials in transit, for example passwords, API keys or JSON Web Tokens. It also allows clients to authenticate the service and guarantees integrity of the transmitted data.
 
-See the [Transport Layer Protection Cheat Sheet](Transport_Layer_Protection_Cheat_Sheet.md) for additional information.
+See the [Transport Layer Security Cheat Sheet](Transport_Layer_Security_Cheat_Sheet.md) for additional information.
 
 Consider the use of mutually authenticated client-side certificates to provide additional protection for highly privileged web services.
 
@@ -56,7 +56,7 @@ Some claims have been standardized and should be present in JWT used for access 
 - `exp` or expiration time - is the current time before the end of the validity period of this token?
 - `nbf` or not before time - is the current time after the start of the validity period of this token?
 
-As JWTs contain details of the authenticated entity (user etc.) a disconnect can occur between the JWT and the current state of the users session, for example, if the session is terminated earlier than the expiration time due to an explicit logout or an idle timeout. When an explicit session termination event occurs, a digest or hash of any associated JWTs should be submitted to a block list on the API which will invalidate that JWT for any requests until the expiration of the token. See the [JSON_Web_Token_for_Java_Cheat_Sheet](JSON_Web_Token_for_Java_Cheat_Sheet.md#token-explicit-revocation-by-the-user) for further details.
+As JWTs contain details of the authenticated entity (user etc.) a disconnect can occur between the JWT and the current state of the users session, for example, if the session is terminated earlier than the expiration time due to an explicit logout or an idle timeout. When an explicit session termination event occurs, a digest or hash of any associated JWTs should be submitted to a denylist on the API which will invalidate that JWT for any requests until the expiration of the token. See the [JSON_Web_Token_for_Java_Cheat_Sheet](JSON_Web_Token_for_Java_Cheat_Sheet.md#token-explicit-revocation-by-the-user) for further details.
 
 ## API Keys
 
@@ -71,8 +71,8 @@ API keys can reduce the impact of denial-of-service attacks. However, when they 
 
 ## Restrict HTTP methods
 
-- Apply an allow list of permitted HTTP Methods e.g. `GET`, `POST`, `PUT`.
-- Reject all requests not matching the allow list with HTTP response code `405 Method not allowed`.
+- Apply an allowlist of permitted HTTP Methods e.g. `GET`, `POST`, `PUT`.
+- Reject all requests not matching the allowlist with HTTP response code `405 Method not allowed`.
 - Make sure the caller is authorised to use the incoming HTTP method on the resource collection, action, and record
 
 In Java EE in particular, this can be difficult to implement properly. See [Bypassing Web Authentication and Authorization with HTTP Verb Tampering](../assets/REST_Security_Cheat_Sheet_Bypassing_VBAAC_with_HTTP_Verb_Tampering.pdf) for an explanation of this common misconfiguration.
@@ -98,7 +98,7 @@ A REST request or response body should match the intended content type in the he
 
 ### Validate request content types
 
-- Reject requests containing unexpected or missing content type headers with HTTP response status `406 Unacceptable` or `415 Unsupported Media Type`.
+- Reject requests containing unexpected or missing content type headers with HTTP response status `406 Unacceptable` or `415 Unsupported Media Type`. For requests with `Content-Length: 0` however, a `Content-type` header is optional.
 - For XML content types ensure appropriate XML parser hardening, see the [XXE cheat sheet](XML_External_Entity_Prevention_Cheat_Sheet.md).
 - Avoid accidentally exposing unintended content types by explicitly defining content types e.g. [Jersey](https://jersey.github.io/) (Java) `@consumes("application/json"); @produces("application/json")`. This avoids [XXE-attack](https://owasp.org/www-community/vulnerabilities/XML_External_Entity_%28XXE%29_Processing) vectors for example.
 
@@ -139,20 +139,20 @@ The following headers should be included in all API responses:
 
 | Header | Rationale |
 |--------|-----------|
-| `Cache-Control: no-store` | Prevent sensitive information from being cached. |
-| `Content-Security-Policy: frame-ancestors 'none'` | To protect against [drag-and-drop](https://www.w3.org/Security/wiki/Clickjacking_Threats#Drag_and_drop_attacks) style clickjacking attacks. |
-| `Content-Type` | To specify the content type of the response. This should be `application/json` for JSON responses. |
-| `Strict-Transport-Security` | To require connections over HTTPS and to protect against spoofed certificates. |
-| `X-Content-Type-Options: nosniff` | To prevent browsers from performing MIME sniffing, and inappropriately interpreting responses as HTML. |
-| `X-Frame-Options: DENY` | To protect against drag-and-drop style clickjacking attacks. |
+| `Cache-Control: no-store` | Header used to direct caching done by browsers. Providing `no-store` indicates that any caches of any kind (private or shared) should not store the response that contains the header. A browser must make a new request everytime the API is called to fetch the latest response. This header with a `no-store` value prevents sensitive information from being cached or stored. |
+| `Content-Security-Policy: frame-ancestors 'none'` | Header used to specify whether a response can be framed in a `<frame>`, `<iframe>`, `<embed>` or `<object>` element. For an API response, there is no requirement to be framed in any of those elements. Providing `frame-ancestors 'none'` prevents any domain from framing the response returned by the API call. This header protects against [drag-and-drop](https://www.w3.org/Security/wiki/Clickjacking_Threats#Drag_and_drop_attacks) style clickjacking attacks. |
+| `Content-Type` | Header to specify the content type of a response. This must be specified as per the type of content returned by an API call. If not specified or if specified incorrectly, a browser might attempt to guess the content type of the response. This can return in MIME sniffing attacks. One common content type value is `application/json` if the API response is JSON. |
+| `Strict-Transport-Security` | Header to instruct a browser that the domain should only be accessed using HTTPS, and that any future attempts to access it using HTTP should automatically be converted to HTTPS. This header ensures that API calls are made over HTTPS and protects against spoofed certificates. |
+| `X-Content-Type-Options: nosniff` | Header to instruct a browser to always use the MIME type that is declared in the `Content-Type` header rather than trying to determine the MIME type based on the file's content. This header with a `nosniff` value prevents browsers from performing MIME sniffing, and inappropriately interpreting responses as HTML. |
+| `X-Frame-Options: DENY` | Header used to specify whether a response can be framed in a `<frame>`, `<iframe>`, `<embed>` or `<object>` element. For an API response, there is no requirement to be framed in any of those elements. Providing `DENY` prevents any domain from framing the response returned by the API call. This header with a `DENY` value protects protect against [drag-and-drop](https://www.w3.org/Security/wiki/Clickjacking_Threats#Drag_and_drop_attacks) style clickjacking attacks. |
 
-The headers below are only intended to provide additional security when responses are rendered as HTML. As such, if the API will __never__ return HTML in responses, then these headers may not be necessary. However, if there is any uncertainty about the function of the headers, or the types of information that the API returns (or may return in future), then it is recommended to include them as part of a defence-in-depth approach.
+The headers below are only intended to provide additional security when responses are rendered as HTML. As such, if the API will **never** return HTML in responses, then these headers may not be necessary. However, if there is any uncertainty about the function of the headers, or the types of information that the API returns (or may return in future), then it is recommended to include them as part of a defence-in-depth approach.
 
-| Header | Rationale |
-|--------|-----------|
-| `Content-Security-Policy: default-src 'none'` | The majority of CSP functionality only affects pages rendered as HTML. |
-| `Feature-Policy: 'none'` | Feature policies only affect pages rendered as HTML. |
-| `Referrer-Policy: no-referrer` | Non-HTML responses should not trigger additional requests. |
+| Header | Example | Rationale |
+|--------|-----------|-----------|
+| Content-Security-Policy | `Content-Security-Policy: default-src 'none'` | The majority of CSP functionality only affects pages rendered as HTML. |
+| Permissions-Policy | `Permissions-Policy: accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), cross-origin-isolated=(), display-capture=(), document-domain=(), encrypted-media=(), execution-while-not-rendered=(), execution-while-out-of-viewport=(), fullscreen=(), geolocation=(), gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), navigation-override=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=()` | This header used to be named Feature-Policy. When browsers heed this header, it is used to control browser features via directives. The example disables features with an empty allowlist for a number of permitted [directive names](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy#directives). When you apply this header, verify that the directives are up-to-date and fit your needs. Please have a look at this [article](https://developer.chrome.com/en/docs/privacy-sandbox/permissions-policy) for a detailed explanation on how to control browser features. |
+| Referrer-Policy | `Referrer-Policy: no-referrer` | Non-HTML responses should not trigger additional requests. |
 
 ## CORS
 
@@ -176,7 +176,7 @@ RESTful web services should be careful to prevent leaking credentials. Passwords
 
 **NOT OK:**
 
-`https://example.com/controller/123/action?apiKey=a53f435643de32` because API Key is into the URL.
+`https://example.com/controller/123/action?apiKey=a53f435643de32` because the apiKey is in the URL.
 
 ## HTTP Return Code
 

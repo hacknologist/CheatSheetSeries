@@ -22,18 +22,18 @@ RESTful web services (often called simply REST) are a light weight variant of We
     - No application utilizes all the available functions and parameters exposed by the service
     - Those used are often activated dynamically by client side code and not as links in pages.
     - The client application is often not a web application and does not allow inspection of the activating link or even relevant code.
-- The parameters are none standard making it hard to determine what is just part of the URL or a constant header and what is a parameter worth [fuzzing](https://owasp.org/www-community/Fuzzing).
+- The parameters are non-standard making it hard to determine what is just part of the URL or a constant header and what is a parameter worth [fuzzing](https://owasp.org/www-community/Fuzzing).
 - As a machine interface the number of parameters used can be very large, for example a JSON structure may include dozens of parameters. [fuzzing](https://owasp.org/www-community/Fuzzing) each one significantly lengthen the time required for testing.
 - Custom authentication mechanisms require reverse engineering and make popular tools not useful as they cannot track a login session.
 
 ## How to pentest a RESTful web service
 
-Determine the attack surface through documentation - RESTful pen testing might be better off if some level of white box testing is allowed and you can get information about the service.
+Determine the attack surface through documentation - RESTful pen testing might be better off if some level of clear-box testing is allowed and you can get information about the service.
 
 This information will ensure fuller coverage of the attack surface. Such information to look for:
 
 - Formal service description - While for other types of web services such as SOAP a formal description, usually in WSDL is often available, this is seldom the case for REST. That said, either WSDL 2.0 or WADL can describe REST and are sometimes used.
-- A developer guide for using the service may be less detailed but will commonly be found, and might even be considered *black box*.
+- A developer guide for using the service may be less detailed but will commonly be found, and might even be considered *opaque-box* testing.
 - Application source or configuration - in many frameworks, including dotNet ,the REST service definition might be easily obtained from configuration files rather than from code.
 
 Collect full requests using a [proxy](https://www.zaproxy.org/) - while always an important pen testing step, this is more important for REST based applications as the application UI may not give clues on the actual attack surface.
@@ -65,4 +65,4 @@ Lastly, when [fuzzing](https://owasp.org/www-community/Fuzzing), don't forget to
 ## Related Resources
 
 - [REST Security Cheat Sheet](REST_Security_Cheat_Sheet.md) - the other side of this cheat sheet
-- [RESTful services, web security blind spot](https://xiom.com/2016/10/31/restful-services-web-security-blind-spot/) - a presentation (including video) elaborating on most of the topics on this cheat sheet.
+- [YouTube: RESTful services, web security blind spot](https://www.youtube.com/watch?v=pWq4qGLAZHI) - a video presentation elaborating on most of the topics on this cheat sheet.

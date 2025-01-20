@@ -183,7 +183,7 @@ During a websocket channel initiation, the browser sends the **Origin** HTTP req
 
 An example of an attack using this vector, named *Cross-Site WebSocket Hijacking (CSWSH)*, is described [here](https://www.christian-schneider.net/CrossSiteWebSocketHijacking.html).
 
-The code below defines a configuration that applies filtering based on an "allow list" of origins. This ensures that only allowed origins can establish a full handshake:
+The code below defines a configuration that applies filtering based on an "allowlist" of origins. This ensures that only allowed origins can establish a full handshake:
 
 ``` java
 import org.owasp.encoder.Encode;
@@ -239,7 +239,7 @@ public class EndpointConfigurator extends ServerEndpointConfig.Configurator {
 
 When using websocket as communication channel, it's important to use an authentication method allowing the user to receive an access *Token* that is not automatically sent by the browser and then must be explicitly sent by the client code during each exchange.
 
-HMAC digests are the simplest method, and [JSON Web Token](https://jwt.io/introduction/) is a good feature rich alternative, because it allows the transport of access ticket information in a stateless and not alterable way. Moreover, it defines a validity timeframe. You can find additional information about JWT token hardening on this [cheat sheet](JSON_Web_Token_for_Java_Cheat_Sheet.md).
+HMAC digests are the simplest method, and [JSON Web Token](https://jwt.io/introduction/) is a good feature rich alternative, because it allows the transport of access ticket information in a stateless and not alterable way. Moreover, it defines a validity timeframe. You can find additional information about JWT hardening on this [cheat sheet](JSON_Web_Token_for_Java_Cheat_Sheet.md).
 
 [JSON Validation Schema](http://json-schema.org/) are used to define and validate the expected content in input and output messages.
 
@@ -413,7 +413,7 @@ public class AuthenticationMessageHandler implements MessageHandler.Whole<Authen
 }
 ```
 
-**Utility class to manage JWT token** - Handle the issuing and the validation of the access token. Simple JWT token has been used for the example (focus was made here on the global WS endpoint implementation) here without extra hardening (see this [cheat sheet](JSON_Web_Token_for_Java_Cheat_Sheet.md) to apply extra hardening on the JWT token)
+**Utility class to manage JWT** - Handle the issuing and the validation of the access token. Simple JWT has been used for the example (focus was made here on the global WS endpoint implementation) here without extra hardening (see this [cheat sheet](JSON_Web_Token_for_Java_Cheat_Sheet.md) to apply extra hardening on the JWT)
 
 ``` java
 import com.auth0.jwt.JWT;
@@ -731,13 +731,13 @@ Note that the same approach is used in the messages handling part of the POC. Al
 
 Authorization information is stored in the access token using the JWT *Claim* feature (in the POC the name of the claim is *access_level*). Authorization is validated when a request is received and before any other action using the user input information.
 
-The access token is passed with every message sent to the message endpoint and a block list is used in order to allow the user to request an explicit token invalidation.
+The access token is passed with every message sent to the message endpoint and a denylist is used in order to allow the user to request an explicit token invalidation.
 
 Explicit token invalidation is interesting from a user's point of view because, often when tokens are used, the validity timeframe of the token is relatively long (it's common to see a valid timeframe superior to 1 hour) so it's important to allow a user to have a way to indicate to the system "OK, I have finished my exchange with you, so you can close our exchange session and cleanup associated links".
 
 It also helps the user to revoke itself of current access if a malicious concurrent access is detected using the same token (case of token stealing).
 
-**Token block list** - Maintain a temporary list using memory and time limited Caching of hashes of token that are not allowed to be used anymore
+**Token denylist** - Maintain a temporary list using memory and time limited Caching of hashes of token that are not allowed to be used anymore
 
 ``` java
 import org.apache.commons.jcs.JCS;
@@ -774,7 +774,7 @@ public class AccessTokenBlocklistUtils {
     }
 
     /**
-     * Add token into the block list
+     * Add token into the denylist
      *
      * @param token Token for which the hash must be added
      * @throws NoSuchAlgorithmException If SHA256 is not available
@@ -789,7 +789,7 @@ public class AccessTokenBlocklistUtils {
     }
 
     /**
-     * Check if a token is present in the block list
+     * Check if a token is present in the denylist
      *
      * @param token Token for which the presence of the hash must be verified
      * @return TRUE if token is block-listed

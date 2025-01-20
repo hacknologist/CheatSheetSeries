@@ -2,9 +2,11 @@
 
 ## Objective
 
-This cheatsheet will help users of the [OWASP Proactive Controls](https://owasp.org/www-project-proactive-controls/) identify which cheatsheets map to each proactive controls item. This mapping is based the [OWASP Proactive Controls](https://owasp.org/www-project-proactive-controls/) version 3.0 (2018).
+> The OWASP Top Ten Proactive Controls 2018 is a list of security techniques that should be included in every software development project. They are ordered by order of importance, with control number 1 being the most important.
 
-## 1. Define Security Requirements
+This cheat sheet will help users of the [OWASP Top Ten Proactive Controls 2018](https://top10proactive.owasp.org/archive/2018/0x02-about-project/) identify which cheat sheets map to each proactive control.
+
+## [C1. Define Security Requirements](https://top10proactive.owasp.org/archive/2018/c1-security-requirements/)
 
 [Abuse Case Cheat Sheet](cheatsheets/Abuse_Case_Cheat_Sheet.md)
 
@@ -12,7 +14,7 @@ This cheatsheet will help users of the [OWASP Proactive Controls](https://owasp.
 
 [Threat Modeling Cheat Sheet](cheatsheets/Threat_Modeling_Cheat_Sheet.md)
 
-## 2. Leverage Security Frameworks and Libraries
+## [C2. Leverage Security Frameworks and Libraries](https://top10proactive.owasp.org/archive/2018/c2-leverage-security-frameworks-libraries/)
 
 [Clickjacking Defense Cheat Sheet](cheatsheets/Clickjacking_Defense_Cheat_Sheet.md)
 
@@ -26,7 +28,7 @@ This cheatsheet will help users of the [OWASP Proactive Controls](https://owasp.
 
 [Vulnerable Dependency Management Cheat Sheet](cheatsheets/Vulnerable_Dependency_Management_Cheat_Sheet.md)
 
-## 3. Secure Database Access
+## [C3. Secure Database Access](https://top10proactive.owasp.org/archive/2018/c3-secure-database/)
 
 [DotNet Security Cheat Sheet (Data Access)](cheatsheets/DotNet_Security_Cheat_Sheet.md#data-access)
 
@@ -38,7 +40,7 @@ This cheatsheet will help users of the [OWASP Proactive Controls](https://owasp.
 
 [SQL Injection Prevention Cheat Sheet](cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.md)
 
-## 4. Encode and Escape Data
+## [C4. Encode and Escape Data](https://top10proactive.owasp.org/archive/2018/c4-encode-escape-data/)
 
 [AJAX Security Cheat Sheet (Client Side)](cheatsheets/AJAX_Security_Cheat_Sheet.md#client-side-javascript)
 
@@ -52,7 +54,7 @@ This cheatsheet will help users of the [OWASP Proactive Controls](https://owasp.
 
 [LDAP Injection Prevention Cheat Sheet](cheatsheets/LDAP_Injection_Prevention_Cheat_Sheet.md)
 
-## 5. Validate All Inputs
+## [C5. Validate All Inputs](https://top10proactive.owasp.org/archive/2018/c5-validate-inputs/)
 
 [Bean Validation Cheat Sheet](cheatsheets/Bean_Validation_Cheat_Sheet.md)
 
@@ -88,7 +90,7 @@ This cheatsheet will help users of the [OWASP Proactive Controls](https://owasp.
 
 [Server Side Request Forgery Prevention Cheat Sheet](cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.md)
 
-## 6. Implement Digital Identity
+## [C6. Implement Digital Identity](https://top10proactive.owasp.org/archive/2018/c6-digital-identity/)
 
 [Authentication Cheat Sheet](cheatsheets/Authentication_Cheat_Sheet.md)
 
@@ -116,7 +118,9 @@ This cheatsheet will help users of the [OWASP Proactive Controls](https://owasp.
 
 [Session Management Cheat Sheet](cheatsheets/Session_Management_Cheat_Sheet.md)
 
-## 7. Enforce Access Controls
+[Multi-Factor Authentication Cheat Sheet](cheatsheets/Multifactor_Authentication_Cheat_Sheet.md)
+
+## [C7. Enforce Access Controls](https://top10proactive.owasp.org/archive/2018/c7-enforce-access-controls/)
 
 [Access Control Cheat Sheet](cheatsheets/Access_Control_Cheat_Sheet.md)
 
@@ -140,7 +144,9 @@ This cheatsheet will help users of the [OWASP Proactive Controls](https://owasp.
 
 [Transaction Authorization Cheat Sheet](cheatsheets/Transaction_Authorization_Cheat_Sheet.md)
 
-## 8. Protect Data Everywhere
+[Multi-Factor Authentication Cheat Sheet](cheatsheets/Multifactor_Authentication_Cheat_Sheet.md)
+
+## [C8. Protect Data Everywhere](https://top10proactive.owasp.org/archive/2018/c8-protect-data-everywhere/)
 
 [Cryptographic Storage Cheat Sheet](cheatsheets/Cryptographic_Storage_Cheat_Sheet.md)
 
@@ -148,9 +154,7 @@ This cheatsheet will help users of the [OWASP Proactive Controls](https://owasp.
 
 [DotNet Security Cheat Sheet (A6 Sensitive data exposure)](cheatsheets/DotNet_Security_Cheat_Sheet.md#a6-sensitive-data-exposure)
 
-[TLS Cipher String Cheat Sheet](cheatsheets/TLS_Cipher_String_Cheat_Sheet.md)
-
-[Transport Layer Protection Cheat Sheet](cheatsheets/Transport_Layer_Protection_Cheat_Sheet.md)
+[Transport Layer Security Cheat Sheet](cheatsheets/Transport_Layer_Security_Cheat_Sheet.md)
 
 [Key Management Cheat Sheet](cheatsheets/Key_Management_Cheat_Sheet.md)
 
@@ -164,13 +168,13 @@ This cheatsheet will help users of the [OWASP Proactive Controls](https://owasp.
 
 [User Privacy Protection Cheat Sheet](cheatsheets/User_Privacy_Protection_Cheat_Sheet.md)
 
-## 9. Implement Security Logging and Monitoring
+## [C9. Implement Security Logging and Monitoring](https://top10proactive.owasp.org/archive/2018/c9-security-logging/)
 
 [REST Security Cheat Sheet (Audit Logs)](cheatsheets/REST_Security_Cheat_Sheet.md#audit-logs)
 
 [Logging Cheat Sheet](cheatsheets/Logging_Cheat_Sheet.md)
 
-## 10. Handle All Errors and Exceptions
+## [C10. Handle All Errors and Exceptions](https://top10proactive.owasp.org/archive/2018/c10-errors-exceptions/)
 
 [REST Security Cheat Sheet (Error Handling)](cheatsheets/REST_Security_Cheat_Sheet.md#error-handling)
 

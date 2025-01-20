@@ -66,19 +66,11 @@ By default, protection against XSS comes as the default behavior. When string da
 
 # Wrong! Do not do this!
 <%= @product.name.html_safe %>
-
-# Wrong! Do not do this!
-<%= content_tag @product.name %>
 ```
 
-Unfortunately, any field that uses `raw`, `html_safe`, `content_tag` or similar like this will be a potential XSS target. Note that there are also widespread misunderstandings about `html_safe()`.
+Unfortunately, any field that uses `raw`, `html_safe` or similar like this will be a potential XSS target. Note that there are also widespread misunderstandings about `html_safe()`.
 
-[This writeup](https://stackoverflow.com/questions/4251284/raw-vs-html-safe-vs-h-to-unescape-html) describes the underlying SafeBuffer mechanism in detail. Other tags that change the way strings are prepared for output can introduce similar issues, including content_tag.
-
-``` ruby
-content_tag("/><script>alert('hack!');</script>") # XSS example
-# produces: </><script>alert('hack!');</script>><//><script>alert('hack!');</script>>
-```
+[This writeup](https://stackoverflow.com/questions/4251284/raw-vs-html-safe-vs-h-to-unescape-html) describes the underlying SafeBuffer mechanism in detail. Other tags that change the way strings are prepared for output can introduce similar issues.
 
 The method `html_safe` of String is somewhat confusingly named. It means that we know for sure the content of the string is safe to include in HTML without escaping. **This method itself is un-safe!**
 
@@ -273,7 +265,7 @@ Example:
 
 `http://www.example.com/redirect?url=http://badhacker.com`
 
-The most basic, but restrictive protection is to use the `:only_path` option. Setting this to true will essentially strip out any host information. However, the `:only_path` option must be part of the first argument. If the first argument is not a hash table, then there is no way to pass in this option. In the absence of a custom helper or allow list, this is one approach that can work:
+The most basic, but restrictive protection is to use the `:only_path` option. Setting this to true will essentially strip out any host information. However, the `:only_path` option must be part of the first argument. If the first argument is not a hash table, then there is no way to pass in this option. In the absence of a custom helper or allowlist, this is one approach that can work:
 
 ``` ruby
 begin
@@ -297,7 +289,7 @@ host = URI.parse("#{params[:url]}").host
 validation_routine(host) if host
 def validation_routine(host)
   # Validation routine where we use  \A and \z as anchors *not* ^ and $
-  # you could also check the host value against an allow list
+  # you could also check the host value against an allowlist
 end
 ```
 
@@ -357,7 +349,7 @@ When standard HTTP constructs are used:
 
 *The request is sent and the browser, upon receiving a response, inspects the response headers in order to determine if the response can and should be processed.*
 
-Allow list in Rails:
+Allowlist in Rails:
 
 **Gemfile:**
 
@@ -463,6 +455,8 @@ In general, it is important to have a process for updating dependencies. An exam
 ## Tools
 
 Use [brakeman](https://brakemanscanner.org/), an open source code analysis tool for Rails applications, to identify many potential issues. It will not necessarily produce comprehensive security findings, but it can find easily exposed issues. A great way to see potential issues in Rails is to review the brakeman documentation of warning types.
+
+A newer alternative is [bearer](https://github.com/Bearer/bearer), an open source code security and privacy analysis tool for both Ruby and JavaScript/TypeScript code, in order to identify a broad range of OWASP Top 10 potential issues. It provides many configuration options and can easily integrate into your CI/CD pipeline.
 
 There are emerging tools that can be used to track security issues in dependency sets, like automated scanning from [GitHub](https://github.blog/2017-11-16-introducing-security-alerts-on-github/) and [GitLab](https://docs.gitlab.com/ee/user/application_security/dependency_scanning/).
 

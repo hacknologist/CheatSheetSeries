@@ -6,13 +6,13 @@ This article is focused on providing clear, actionable guidance for safely deser
 
 ## What is Deserialization
 
-**Serialization** is the process of turning some object into a data format that can be restored later. People often serialize objects in order to save them to storage, or to send as part of communications.
+**Serialization** is the process of turning some object into a data format that can be restored later. People often serialize objects in order to save them for storage, or to send as part of communications.
 
-**Deserialization** is the reverse of that process, taking data structured from some format, and rebuilding it into an object. Today, the most popular data format for serializing data is JSON. Before that, it was XML.
+**Deserialization** is the reverse of that process, taking data structured in some format, and rebuilding it into an object. Today, the most popular data format for serializing data is JSON. Before that, it was XML.
 
-However, many programming languages offer a native capability for serializing objects. These native formats usually offer more features than JSON or XML, including customizability of the serialization process.
+However, many programming languages have native ways to serialize objects. These native formats usually offer more features than JSON or XML, including customization of the serialization process.
 
-Unfortunately, the features of these native deserialization mechanisms can be repurposed for malicious effect when operating on untrusted data. Attacks against deserializers have been found to allow denial-of-service, access control, and remote code execution (RCE) attacks.
+Unfortunately, the features of these native deserialization mechanisms can sometimes be repurposed for malicious effect when operating on untrusted data. Attacks against deserializers have been found to allow denial-of-service, access control, or remote code execution (RCE) attacks.
 
 ## Guidance on Deserializing Objects Safely
 
@@ -20,17 +20,17 @@ The following language-specific guidance attempts to enumerate safe methodologie
 
 ### PHP
 
-#### WhiteBox Review
+#### Clear-box Review
 
-Check the use of [unserialize()](https://www.php.net/manual/en/function.unserialize.php) function and review how the external parameters are accepted. Use a safe, standard data interchange format such as JSON (via `json_decode()` and `json_encode()`) if you need to pass serialized data to the user.
+Check the use of [`unserialize()`](https://www.php.net/manual/en/function.unserialize.php) function and review how the external parameters are accepted. Use a safe, standard data interchange format such as JSON (via `json_decode()` and `json_encode()`) if you need to pass serialized data to the user.
 
 ### Python
 
-#### BlackBox Review
+#### Opaque-box Review
 
-If the traffic data contains the symbol dot `.` at the end, it's very likely that the data was sent in serialization.
+If the traffic data contains the symbol dot `.` at the end, it's very likely that the data was sent in serialization. It will be only true if the data is not being encoded using Base64 or Hexadecimal schemas. If the data is being encoded, then it's best to check if the serialization is likely happening or not by looking at the starting characters of the parameter value. For example if data is Base64 encoded, then it will most likely start with `gASV`.
 
-#### WhiteBox Review
+#### Clear-box Review
 
 The following API in Python will be vulnerable to serialization attack. Search code for the pattern below.
 
@@ -61,7 +61,7 @@ Implementation advices:
 - In your code, override the `ObjectInputStream#resolveClass()` method to prevent arbitrary classes from being deserialized. This safe behavior can be wrapped in a library like [SerialKiller](https://github.com/ikkisoft/SerialKiller).
 - Use a safe replacement for the generic `readObject()` method as seen here. Note that this addresses "[billion laughs](https://en.wikipedia.org/wiki/Billion_laughs_attack)" type attacks by checking input length and number of objects deserialized.
 
-#### WhiteBox Review
+#### Clear-box Review
 
 Be aware of the following Java API uses for potential serialization vulnerability.
 
@@ -71,15 +71,15 @@ Be aware of the following Java API uses for potential serialization vulnerabilit
 
 3. `ObjectInputStream` with `readObject`
 
-4. Uses of `readObject`, `readObjectNodData`, `readResolve` or `readExternal`
+4. Uses of `readObject`, `readObjectNoData`, `readResolve` or `readExternal`
 
 5. `ObjectInputStream.readUnshared`
 
 6. `Serializable`
 
-#### BlackBox Review
+#### Opaque-box Review
 
-If the captured traffic data include the following patterns may suggest that the data was sent in Java serialization streams
+If the captured traffic data includes the following patterns, it may suggest that the data was sent in Java serialization streams:
 
 - `AC ED 00 05` in Hex
 - `rO0` in Base64
@@ -91,7 +91,7 @@ If there are data members of an object that should never be controlled by end us
 
 For a class that defined as Serializable, the sensitive information variable should be declared as `private transient`.
 
-For example, the class myAccount, the variable 'profit' and 'margin' were declared as transient to avoid to be serialized:
+For example, the class `myAccount`, the variables 'profit' and 'margin' were declared as transient to prevent them from being serialized.
 
 ```java
 public class myAccount implements Serializable
@@ -104,7 +104,7 @@ public class myAccount implements Serializable
 
 #### Prevent Deserialization of Domain Objects
 
-Some of your application objects may be forced to implement Serializable due to their hierarchy. To guarantee that your application objects can't be deserialized, a `readObject()` method should be declared (with a `final` modifier) which always throws an exception:
+Some of your application objects may be forced to implement `Serializable` due to their hierarchy. To guarantee that your application objects can't be deserialized, a `readObject()` method should be declared (with a `final` modifier) which always throws an exception:
 
 ```java
 private final void readObject(ObjectInputStream in) throws java.io.IOException {
@@ -116,14 +116,14 @@ private final void readObject(ObjectInputStream in) throws java.io.IOException {
 
 The `java.io.ObjectInputStream` class is used to deserialize objects. It's possible to harden its behavior by subclassing it. This is the best solution if:
 
-- You can change the code that does the deserialization
-- You know what classes you expect to deserialize
+- you can change the code that does the deserialization;
+- you know what classes you expect to deserialize.
 
 The general idea is to override [`ObjectInputStream.html#resolveClass()`](http://docs.oracle.com/javase/7/docs/api/java/io/ObjectInputStream.html#resolveClass(java.io.ObjectStreamClass)) in order to restrict which classes are allowed to be deserialized.
 
-Because this call happens before a `readObject()` is called, you can be sure that no deserialization activity will occur unless the type is one that you wish to allow.
+Because this call happens before a `readObject()` is called, you can be sure that no deserialization activity will occur unless the type is one that you allow.
 
-A simple example of this shown here, where the `LookAheadObjectInputStream` class is guaranteed not to deserialize any other type besides the `Bicycle` class:
+A simple example is shown here, where the `LookAheadObjectInputStream` class is guaranteed to **not** deserialize any other type besides the `Bicycle` class:
 
 ```java
 public class LookAheadObjectInputStream extends ObjectInputStream {
@@ -155,7 +155,7 @@ More complete implementations of this approach have been proposed by various com
 
 As mentioned above, the `java.io.ObjectInputStream` class is used to deserialize objects. It's possible to harden its behavior by subclassing it. However, if you don't own the code or can't wait for a patch, using an agent to weave in hardening to `java.io.ObjectInputStream` is the best solution.
 
-Globally changing `ObjectInputStream` is only safe for block-listing known malicious types, because it's not possible to know for all applications what the expected classes to be deserialized are. Fortunately, there are very few classes needed in the blocklist to be safe from all the known attack vectors, today.
+Globally changing `ObjectInputStream` is only safe for block-listing known malicious types, because it's not possible to know for all applications what the expected classes to be deserialized are. Fortunately, there are very few classes needed in the denylist to be safe from all the known attack vectors, today.
 
 It's inevitable that more "gadget" classes will be discovered that can be abused. However, there is an incredible amount of vulnerable software exposed today, in need of a fix. In some cases, "fixing" the vulnerability may involve re-architecting messaging systems and breaking backwards compatibility as developers move towards not accepting serialized objects.
 
@@ -171,9 +171,68 @@ Agents taking this approach have been released by various community members:
 
 A similar, but less scalable approach would be to manually patch and bootstrap your JVM's ObjectInputStream. Guidance on this approach is available [here](https://github.com/wsargent/paranoid-java-serialization).
 
+#### Other Deserialization Libraries and Formats
+
+While the advice above is focused on [Java's Serializable format](https://docs.oracle.com/javase/7/docs/api/java/io/Serializable.html), there are a number of other libraries
+that use other formats for deserialization. Many of these libraries may have similar security
+issues if not configured correctly. This section lists some of these libraries and
+recommended configuration options to avoid security issues when deserializing untrusted data:
+
+**Can be used safely with default configuration:**
+
+The following libraries can be used safely with default configuration:
+
+- **[fastjson2](https://github.com/alibaba/fastjson2)** (JSON) - can be used safely as long as
+the [**autotype**](https://github.com/alibaba/fastjson2/wiki/fastjson2_autotype_cn) option is not turned on
+- **[jackson-databind](https://github.com/FasterXML/jackson-databind)** (JSON) - can be used safely as long
+as polymorphism is not used ([see blog post](https://cowtowncoder.medium.com/on-jackson-cves-dont-panic-here-is-what-you-need-to-know-54cd0d6e8062))
+- **[Kryo v5.0.0+](https://github.com/EsotericSoftware/kryo)** (custom format) - can be used safely
+as long as class registration is not turned **off** ([see documentation](https://github.com/EsotericSoftware/kryo#optional-registration)
+and [this issue](https://github.com/EsotericSoftware/kryo/issues/929))
+- **[YamlBeans v1.16+](https://github.com/EsotericSoftware/yamlbeans)** (YAML) - can be used safely
+as long as the **UnsafeYamlConfig** class isn't used (see [this commit](https://github.com/EsotericSoftware/yamlbeans/commit/b1122588e7610ae4e0d516c50d08c94ee87946e6))
+    - _NOTE: because these versions are not available in Maven Central,
+[a fork exists](https://github.com/Contrast-Security-OSS/yamlbeans) that can be used instead._
+- **[XStream v1.4.17+](https://x-stream.github.io/)** (JSON and XML) - can be used safely
+as long as the allowlist and other security controls are not relaxed ([see documentation](https://x-stream.github.io/security.html))
+
+**Requires configuration before can be used safely:**
+
+The following libraries require configuration options to be set before they can be used safely:
+
+- **[fastjson v1.2.68+](https://github.com/alibaba/fastjson)** (JSON) - cannot be used safely unless
+the [**safemode**](https://github.com/alibaba/fastjson/wiki/fastjson_safemode_en) option is turned on, which disables
+deserialization of any class ([see documentation](https://github.com/alibaba/fastjson/wiki/enable_autotype)).
+Previous versions are not safe.
+- **[json-io](https://github.com/jdereg/json-io)** (JSON) - cannot be used safely since the use of **@type** property in
+JSON allows deserialization of any class. Can only be used safely in following situations:
+    - In [non-typed mode](https://github.com/jdereg/json-io/blob/master/user-guide.md#non-typed-usage) using the **JsonReader.USE_MAPS** setting which turns off generic object deserialization
+    - [With a custom deserializer](https://github.com/jdereg/json-io/blob/master/user-guide.md#customization-technique-4-custom-serializer) controlling which classes get deserialized
+- **[Kryo < v5.0.0](https://github.com/EsotericSoftware/kryo)** (custom format) - cannot be used safely unless class registration is turned **on**,
+which disables deserialization of any class ([see documentation](https://github.com/EsotericSoftware/kryo#optional-registration)
+and [this issue](https://github.com/EsotericSoftware/kryo/issues/929))
+    - _NOTE: other wrappers exist around Kryo such as [Chill](https://github.com/twitter/chill), which may also have class registration
+not required by default regardless of the underlying version of Kryo being used_
+- **[SnakeYAML](https://bitbucket.org/snakeyaml/snakeyaml/src)** (YAML) - cannot be used safely unless
+the **org.yaml.snakeyaml.constructor.SafeConstructor** class is used, which disables
+deserialization of any class ([see docs](https://bitbucket.org/snakeyaml/snakeyaml/wiki/CVE-2022-1471))
+
+**Cannot be used safely:**
+
+The following libraries are either no longer maintained or cannot be used safely with untrusted input:
+
+- **[Castor](https://github.com/castor-data-binding/castor)** (XML) - appears to be abandoned with no commits since 2016
+- **[fastjson < v1.2.68](https://github.com/alibaba/fastjson)** (JSON) - these versions allows deserialization of any class
+([see documentation](https://github.com/alibaba/fastjson/wiki/enable_autotype))
+- **[XMLDecoder in the JDK](https://docs.oracle.com/javase/8/docs/api/java/beans/XMLDecoder.html)** (XML) - _"close to impossible to securely deserialize Java objects in this format from untrusted inputs"_
+("Red Hat Defensive Coding Guide", [end of section 2.6.5](https://redhat-crypto.gitlab.io/defensive-coding-guide/#sect-Defensive_Coding-Tasks-Serialization-XML))
+- **[XStream < v1.4.17](https://x-stream.github.io/)** (JSON and XML) - these versions allows deserialization of any class (see [documentation](https://x-stream.github.io/security.html#explicit))
+- **[YamlBeans < v1.16](https://github.com/EsotericSoftware/yamlbeans)** (YAML) - these versions allows deserialization of any class
+(see [this document](https://github.com/Contrast-Security-OSS/yamlbeans/blob/main/SECURITY.md))
+
 ### .Net CSharp
 
-#### WhiteBox Review
+#### Clear-box Review
 
 Search the source code for the following terms:
 
@@ -182,7 +241,7 @@ Search the source code for the following terms:
 
 Look for any serializers where the type is set by a user controlled variable.
 
-#### BlackBox Review
+#### Opaque-box Review
 
 Search for the following base64 encoded content that starts with:
 
@@ -209,7 +268,7 @@ TypeNameHandling = TypeNameHandling.None
 
 If `JavaScriptSerializer` is to be used then do not use it with a `JavaScriptTypeResolver`.
 
-If you must deserialise data streams that define their own type, then restrict the types that are allowed to be deserialized. One should be aware that this is still risky as many native .Net types potentially dangerous in themselves. e.g.
+If you must deserialize data streams that define their own type, then restrict the types that are allowed to be deserialized. One should be aware that this is still risky as many native .Net types potentially dangerous in themselves. e.g.
 
 ```csharp
 System.IO.FileInfo
@@ -217,7 +276,7 @@ System.IO.FileInfo
 
 `FileInfo` objects that reference files actually on the server can when deserialized, change the properties of those files e.g. to read-only, creating a potential denial of service attack.
 
-Even if you have limited the types that can be deserialised remember that some types have properties that are risky. `System.ComponentModel.DataAnnotations.ValidationException`, for example has a property `Value` of type `Object`. if this type is the type allowed for deserialization then an attacker can set the `Value` property to any object type they choose.
+Even if you have limited the types that can be deserialized remember that some types have properties that are risky. `System.ComponentModel.DataAnnotations.ValidationException`, for example has a property `Value` of type `Object`. if this type is the type allowed for deserialization then an attacker can set the `Value` property to any object type they choose.
 
 Attackers should be prevented from steering the type that will be instantiated. If this is possible then even `DataContractSerializer` or `XmlSerializer` can be subverted e.g.
 
@@ -274,7 +333,7 @@ If the application knows before deserialization which messages will need to be p
 ## Mitigation Tools/Libraries
 
 - [Java secure deserialization library](https://github.com/ikkisoft/SerialKiller)
-- [SWAT](https://github.com/cschneider4711/SWAT) (Serial Whitelist Application Trainer)
+- [SWAT - tool for creating allowlists](https://github.com/cschneider4711/SWAT)
 - [NotSoSerial](https://github.com/kantega/notsoserial)
 
 ## Detection Tools
@@ -323,3 +382,5 @@ If the application knows before deserialization which messages will need to be p
     - [James Forshaw - Black Hat USA 2012 - Are You My Type? Breaking .net Sandboxes Through Serialization](https://www.youtube.com/watch?v=Xfbu-pQ1tIc)
     - [Jonathan Birch BlueHat v17 - Dangerous Contents - Securing .Net Deserialization](https://www.youtube.com/watch?v=oxlD8VWWHE8)
     - [Alvaro Muñoz & Oleksandr Mirosh - Friday the 13th: Attacking JSON - AppSecUSA 2017](https://www.youtube.com/watch?v=NqHsaVhlxAQ)
+- Python
+    - [Exploiting Insecure Deserialization bugs found in the Wild (Python Pickles)](https://macrosec.tech/index.php/2021/06/29/exploiting-insecuredeserialization-bugs-found-in-the-wild-python-pickles.)

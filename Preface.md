@@ -1,4 +1,4 @@
-![OWASPHeader](assets/Preface_Cheatsheet_Header.png)
+# ![OWASPHeader](assets/Preface_Cheatsheet_Header.png)
 
 ![ProjectLogoOfficial](assets/Preface_Cheatsheet_Logo.png)
 
@@ -14,6 +14,11 @@ Project leaders:
 
 - [Jim Manico](https://github.com/jmanico)
 - [Jakub Maćkowski](https://github.com/mackowski)
+
+Core team:
+
+- [Kevin W. Wall](https://github.com/kwwall)
+- [Shlomo Zalman Heigh](https://github.com/szh)
 
 Project links:
 

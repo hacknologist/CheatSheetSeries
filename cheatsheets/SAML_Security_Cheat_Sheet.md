@@ -6,7 +6,7 @@ The **S**ecurity **A**ssertion **M**arkup **L**anguage ([SAML](https://en.wikipe
 
 ## Validate Message Confidentiality and Integrity
 
-[TLS 1.2](Transport_Layer_Protection_Cheat_Sheet.md) is the most common solution to guarantee message confidentiality and integrity at the transport layer. Refer to [SAML Security (section 4.2.1)](https://docs.oasis-open.org/security/saml/v2.0/saml-sec-consider-2.0-os.pdf) for additional information. This step will help counter the following attacks:
+[TLS 1.2](Transport_Layer_Security_Cheat_Sheet.md) is the most common solution to guarantee message confidentiality and integrity at the transport layer. Refer to [SAML Security (section 4.2.1)](https://docs.oasis-open.org/security/saml/v2.0/saml-sec-consider-2.0-os.pdf) for additional information. This step will help counter the following attacks:
 
 - Eavesdropping 7.1.1.1
 - Theft of User Authentication Information 7.1.1.2
@@ -99,7 +99,7 @@ Unsolicited Response is inherently [less secure](https://www.identityserver.com/
 - Follow the validation process mentioned in [SAML Profiles (section 4.1.5)](https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf). This step will help counter the following attacks:
     - Replay (6.1.2)
     - Message Insertion (6.1.3)
-- If the contract of the `RelayState` parameter is a URL, make sure the URL is validated and explicitly on an allow list. This step will help counter the following attack:
+- If the contract of the `RelayState` parameter is a URL, make sure the URL is validated and explicitly on an allowlist. This step will help counter the following attack:
     - [Open Redirect](https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html)
 - Implement proper replay detection either at the response or assertion level. This will help counter the following attack:
     - Replay (6.1.2)

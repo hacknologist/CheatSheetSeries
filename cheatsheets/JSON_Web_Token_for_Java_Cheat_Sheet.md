@@ -61,7 +61,7 @@ In the rest of the article, the term **token** refers to the **JSON Web Tokens**
 
 ## Consideration about Using JWT
 
-Even if a JWT token is "easy" to use and allow to expose services (mostly REST style) in a stateless way, it's not the solution that fits for all applications because it comes with some caveats, like for example the question of the storage of the token (tackled in this cheatsheet) and others...
+Even if a JWT is "easy" to use and allow to expose services (mostly REST style) in a stateless way, it's not the solution that fits for all applications because it comes with some caveats, like for example the question of the storage of the token (tackled in this cheatsheet) and others...
 
 If your application does not need to be fully stateless, you can consider using traditional session system provided by all web frameworks and follow the advice from the dedicated [session management cheat sheet](Session_Management_Cheat_Sheet.md). However, for stateless applications, when well implemented, it's a good candidate.
 
@@ -71,7 +71,7 @@ If your application does not need to be fully stateless, you can consider using 
 
 #### Symptom
 
-This attack, described [here](https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/) occurs when an attacker alters the token and changes the hashing algorithm to indicate, through, the *none* keyword, that the integrity of the token has already been verified. As explained in the link above *some libraries treated tokens signed with the none algorithm as a valid token with a verified signature*, so an attacker can alter the token claims and token will be trusted by the application.
+This attack, described [here](https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/), occurs when an attacker alters the token and changes the hashing algorithm to indicate, through the *none* keyword, that the integrity of the token has already been verified. As explained in the link above *some libraries treated tokens signed with the none algorithm as a valid token with a verified signature*, so an attacker can alter the token claims and the modified token will still be trusted by the application.
 
 #### How to Prevent
 
@@ -105,10 +105,10 @@ This attack occurs when a token has been intercepted/stolen by an attacker and t
 
 A way to prevent it is to add a "user context" in the token. A user context will be composed of the following information:
 
-- A random string that will be generated during the authentication phase. It will be sent to the client as an hardened cookie (flags: [HttpOnly + Secure](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Secure_and_HttpOnly_cookies) + [SameSite](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#SameSite_cookies) + [Max-Age](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie) + [cookie prefixes](https://googlechrome.github.io/samples/cookie-prefixes/)). Avoid setting *expires* header so that the cookie is cleared when the browser is closed. Set *Max-Age* to a value smaller or equal to the value of JWT token expiry, but never more.
+- A random string that will be generated during the authentication phase. It will be sent to the client as an hardened cookie (flags: [HttpOnly + Secure](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Secure_and_HttpOnly_cookies) + [SameSite](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#SameSite_cookies) + [Max-Age](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie) + [cookie prefixes](https://googlechrome.github.io/samples/cookie-prefixes/)). Avoid setting *expires* header so that the cookie is cleared when the browser is closed. Set *Max-Age* to a value smaller or equal to the value of JWT expiry, but never more.
 - A SHA256 hash of the random string will be stored in the token (instead of the raw value) in order to prevent any XSS issues allowing the attacker to read the random string value and setting the expected cookie.
 
-IP addresses should not be used because there are some legitimate situations in which the IP address can change during the same session. For example, when an user accesses an application through their mobile device and the mobile operator changes during the exchange, then the IP address may (often) change. Moreover, using the IP address can potentially cause issues with [European GDPR](http://www.eugdpr.org/) compliance.
+IP addresses should not be used because there are some legitimate situations in which the IP address can change during the same session. For example, when an user accesses an application through their mobile device and the mobile operator changes during the exchange, then the IP address may (often) change. Moreover, using the IP address can potentially cause issues with [European GDPR](https://gdpr.eu/) compliance.
 
 During token validation, if the received token does not contain the right context (for example, if it has been replayed), then it must be rejected.
 
@@ -203,19 +203,19 @@ This problem is inherent to JWT because a token only becomes invalid when it exp
 
 #### How to Prevent
 
-Since JWT tokens are stateless, There is no session maintained on the server(s) serving client requests. As such, there is no session to invalidate on the server side. A well implemented Token Sidejacking solution (as explained above) should alleviate the need for maintaining block list on server side. This is because a hardened cookie used in the Token Sidejacking can be considered as secure a session ID used in the traditional session system, and unless both the cookie and the JWT token are intercepted/stolen, the JWT is unusable. A logout can thus be 'simulated' by clearing the JWT from session storage. If the user chooses to close the browser instead, then both the cookie and sessionStorage are cleared automatically.
+Since JWTs are stateless, There is no session maintained on the server(s) serving client requests. As such, there is no session to invalidate on the server side. A well implemented Token Sidejacking solution (as explained above) should alleviate the need for maintaining denylist on server side. This is because a hardened cookie used in the Token Sidejacking can be considered as secure as a session ID used in the traditional session system, and unless both the cookie and the JWT are intercepted/stolen, the JWT is unusable. A logout can thus be 'simulated' by clearing the JWT from session storage. If the user chooses to close the browser instead, then both the cookie and sessionStorage are cleared automatically.
 
-Another way to protect against this is to implement a token block list that will be used to mimic the "logout" feature that exists with traditional session management system.
+Another way to protect against this is to implement a token denylist that will be used to mimic the "logout" feature that exists with traditional session management system.
 
-The block list will keep a digest (SHA-256 encoded in HEX) of the token with a revocation date. This entry must endure at least until the expiration of the token.
+The denylist will keep a digest (SHA-256 encoded in HEX) of the token with a revocation date. This entry must endure at least until the expiration of the token.
 
-When the user wants to "logout" then it call a dedicated service that will add the provided user token to the block list resulting in an immediate invalidation of the token for further usage in the application.
+When the user wants to "logout" then it call a dedicated service that will add the provided user token to the denylist resulting in an immediate invalidation of the token for further usage in the application.
 
 #### Implementation Example
 
 ##### Block List Storage
 
-A database table with the following structure will be used as the central block list storage.
+A database table with the following structure will be used as the central denylist storage.
 
 ``` sql
 create table if not exists revoked_token(jwt_token_digest varchar(255) primary key,
@@ -224,7 +224,7 @@ revocation_date timestamp default now());
 
 ##### Token Revocation Management
 
-Code in charge of adding a token to the block list and checking if a token is revoked.
+Code in charge of adding a token to the denylist and checking if a token is revoked.
 
 ``` java
 /**
@@ -313,7 +313,7 @@ public class TokenRevoker {
 
 #### Symptom
 
-This attack occurs when an attacker has access to a token (or a set of tokens) and extracts information stored in it (the contents of JWT tokens are base64 encoded, but is not encrypted by default) in order to obtain information about the system. Information can be for example the security roles, login format...
+This attack occurs when an attacker has access to a token (or a set of tokens) and extracts information stored in it (the contents of JWTs are base64 encoded, but is not encrypted by default) in order to obtain information about the system. Information can be for example the security roles, login format...
 
 #### How to Prevent
 
@@ -342,7 +342,7 @@ See RFC5116: https://tools.ietf.org/html/rfc5116
 
 **Note:**
 
-Here ciphering is added mainly to hide internal information but it's very important to remember that the first protection against tampering of the JWT token is the signature. So, the token signature and its verification must be always in place.
+Here ciphering is added mainly to hide internal information but it's very important to remember that the first protection against tampering of the JWT is the signature. So, the token signature and its verification must be always in place.
 
 #### Implementation Example
 
@@ -560,9 +560,9 @@ function myFetchModule() {
         return fetch(req)
     }
 }
-    
+
 ...
- 
+
 // usage:
 const myFetch = new myFetchModule()
 
